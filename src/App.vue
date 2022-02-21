@@ -20,6 +20,7 @@
           </ul>
         </div>
       </div>
+      <div v-if="loading">Loading.... Please wait..</div>
     </div>
   </div>
 </template>
@@ -36,16 +37,22 @@ export default {
     return {
       users: [],
       pageSIze: 10,
+      loading: false,
     }
   },
   beforeMount() {
-    axios.get(`${apiUrl}?results=${this.pageSIze}`).then((res) => {
-      this.users = res.data.results
-    })
+    this.load()
   },
   methods: {
     next() {
-      axios.get(`${apiUrl}?results=${this.pageSIze}`).then((res) => {
+      this.load()
+    },
+    load() {
+      this.loading = true
+      axios.get(`${apiUrl}?results=${this.pageSIze}`).then(async (res) => {
+        // 데이터 로딩 인디케이터를 확인하기 위한 의도적인 지연
+        await new Promise((resolve) => setTimeout(() => resolve(), 2000))
+        this.loading = false
         this.users = [...this.users, ...res.data.results]
       })
     },
