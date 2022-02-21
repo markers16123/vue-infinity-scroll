@@ -1,5 +1,5 @@
 <template>
-  <div class="app" v-infinity="{ callback: next }">
+  <div class="app" v-infinity="{ callback: next, hitw: 1000 }">
     <div>
       <h1 class="header">Random User : {{ users.length }}</h1>
       <div class="user" v-for="user in users" :key="user.first">
@@ -12,7 +12,7 @@
             {{ user.name.last }}
           </h2>
           <ul>
-            <li><strong>Birthday:</strong> {{ formatDate(user.dob.date) }}</li>
+            <li><strong>Birthday:</strong> {{ user.dob.date }}</li>
             <li>
               <strong>Location:</strong> {{ user.location.city }},
               {{ user.location.state }}
@@ -35,24 +35,20 @@ export default {
   data() {
     return {
       users: [],
+      pageSIze: 10,
     }
+  },
+  beforeMount() {
+    axios.get(`${apiUrl}?results=${this.pageSIze}`).then((res) => {
+      this.users = res.data.results
+    })
   },
   methods: {
     next() {
-      axios.get(`${apiUrl}?results=20`).then((res) => {
+      axios.get(`${apiUrl}?results=${this.pageSIze}`).then((res) => {
         this.users = [...this.users, ...res.data.results]
-        this.loading = false
       })
     },
-    formatDate(dateString) {
-      let convertedDate = new Date(dateString)
-      return convertedDate.toDateString()
-    },
-  },
-  beforeMount() {
-    axios.get(`${apiUrl}?results=20`).then((res) => {
-      this.users = res.data.results
-    })
   },
 }
 </script>

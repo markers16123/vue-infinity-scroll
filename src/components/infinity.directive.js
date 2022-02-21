@@ -5,11 +5,9 @@ const infinityDirective = {
    * @param {*} binding 바인딩 데이터
    */
   bind: function (el, { value }) {
-    const { callback } = value
+    const { callback, hitw, hitmw } = value
     if (!callback) {
-      throw new Error(
-        'Invalid Operation Error : You must provide a callback function.'
-      )
+      throw new Error('Invalid Operation Error : You must provide a callback function.')
     }
 
     // 임계점에 도달하고 나서 이후에도 계속 next가 호출되는 것을 방지하기 위한
@@ -28,9 +26,10 @@ const infinityDirective = {
 
         const scrollBottom = scrollTop + clientHeight
         // 임계점을 계산하기 위한 가중치
-        const hitWeight = clientHeight * 2
+        const hitMinWeight = hitmw ?? 500
+        const hitWeight = hitw ?? clientHeight * 2
         // 임계점 계산, 다음 페이지를 가져와야 하는 지점
-        const hitPoint = scrollHeight - (hitWeight < 500 ? 500 : hitWeight)
+        const hitPoint = scrollHeight - (hitWeight > hitMinWeight ? hitWeight : hitMinWeight)
 
         if (
           // 임계점에 도달하였는지 여부 확인
